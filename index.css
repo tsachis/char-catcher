@@ -1,3 +1,8 @@
+@font-face {
+  font-family: my-heb-font;
+  src: url(./fonts/hebrew.ttf);
+}
+
 .container {
   position: absolute;
   top: 0;
@@ -7,10 +12,69 @@
   background: black;
 }
 
+.container::before {
+  content: '';
+  border-bottom: 5px dotted #af9393;
+  position: absolute;
+  bottom: 360px;
+  left: 0;
+  right: 0;
+}
+
+.panel {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 200px;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  z-index: 10;
+  font-size: 30px;
+  color: #eee;
+  text-align: right;
+  padding: 10px;
+  font-family: my-heb-font;
+}
+
 .letter {
   position: absolute;
   bottom: 100%;
-  color: #0f7f0a;
+  color: #6cce68;
   font-size: 40px;
+  font-family: my-heb-font;
   transition: bottom 1s linear;
+}
+
+
+/* CSS3 BACKGROUNDS */
+.background-1 {
+  background-color:black;
+  background-image:
+          radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
+          radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
+          radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 40px),
+          radial-gradient(rgba(255,255,255,.4), rgba(255,255,255,.1) 2px, transparent 30px);
+  background-size: 550px 550px, 350px 350px, 250px 250px, 150px 150px;
+  background-position: 0 0, 40px 60px, 130px 270px, 70px 100px;
+}
+
+.background-2 {
+  background: linear-gradient(27deg, #151515 5px, transparent 5px) 0 5px,
+  linear-gradient(207deg, #151515 5px, transparent 5px) 10px 0,
+  linear-gradient(27deg, #222 5px, transparent 5px) 0 10px,
+  linear-gradient(207deg, #222 5px, transparent 5px) 10px 5px,
+  linear-gradient(90deg, #1b1b1b 10px, transparent 10px),
+  linear-gradient(#1d1d1d 25%, #1a1a1a 25%, #1a1a1a 50%, transparent 50%, transparent 75%, #242424 75%, #242424);
+  background-color: #131313;
+  background-size: 20px 20px;
+}
+
+.background-3 {
+  background:
+          radial-gradient(black 15%, transparent 16%) 0 0,
+          radial-gradient(black 15%, transparent 16%) 8px 8px,
+          radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 0 1px,
+          radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 8px 9px;
+  background-color:#282828;
+  background-size:16px 16px;
 }
