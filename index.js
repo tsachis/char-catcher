@@ -8,6 +8,8 @@ class CharCatcher {
     this.MAX_COLUMN = 50;
     this.BACKGROUNDS = 3;
     this.LEVEL_SIZE = 100;
+    this.REMOVE_LETTER_SPEED = 300;
+    this.PAUSE_KEY = 'Escape';
     this.levels = [500, 300, 200, 100, 50];
     this.level = 0;
     this.MAX_ROW = 10;
@@ -17,7 +19,8 @@ class CharCatcher {
     this.container = document.querySelector('.container');
     this.container.classList.add(this.getRandomBackground());
     this.score = 0;
-    document.addEventListener('keypress', (event) => {
+    this.removeLettersEnabled = true;
+    document.addEventListener('keyup', (event) => {
       this.handleKeyPress(event.key);
     }, false);
     this.renderPanel();
@@ -74,7 +77,7 @@ class CharCatcher {
   checkGameOver(el) {
     el.removeEventListener("transitionend", el.gameOverChecker, false);
     if (this.isRunning() && el.dataset.row > this.MAX_ROW) {
-      console.log('Game Over');
+      document.querySelector('#game-over').classList.add('game-over');
       this.pause();
     }
   }
@@ -93,30 +96,60 @@ class CharCatcher {
     document.querySelector('.level').innerText = `שלב: ${this.level + 1}`;
   }
 
+  showRemoveAnimation(lettersToRemove) {
+    return new Promise((resolve) => {
+      lettersToRemove.forEach(letter => {
+        letter.style.transition = `all ${this.REMOVE_LETTER_SPEED}ms linear`;
+        letter.classList.add('letter-remove');
+      });
+      setTimeout(() => {
+        lettersToRemove.forEach(l => this.container.removeChild(l));
+        resolve();
+      }, this.REMOVE_LETTER_SPEED);
+    });
+
+  }
+
+  fillGaps(colsToCheck) {
+    return new Promise((resolve) => {
+      colsToCheck.forEach(col => {
+        const letterInCol = Array.from(document.querySelectorAll(`.letter-col-${col}`))
+            .sort((a, b) => a.dataset.row - b.dataset.row);
+        letterInCol.forEach((el, index) => {
+          el.dataset.row = index;
+          el.style.transition = 'bottom 100ms linear';
+          this.moveLetterToBottom(el);
+        });
+      });
+      setTimeout(resolve, 100);
+    });
+  }
+
+  getLetterIndex(char) {
+    const index = this.lettersArr.indexOf(char);
+    return index >= 0 ? index : this.lettersArr2.indexOf(char);
+  }
+
+  removeLetters(lettersToRemove) {
+    this.removeLettersEnabled = false;
+    this.updateScore(lettersToRemove.length);
+    const colsToCheck = lettersToRemove.map(l => l.dataset.col);
+    this.showRemoveAnimation(lettersToRemove)
+        .then(this.fillGaps.bind(this, colsToCheck))
+        .then(() => this.removeLettersEnabled = true);
+  }
+
   handleKeyPress(char) {
-    if (char === ' ') {
+    if (char === this.PAUSE_KEY) {
       return this.isRunning() ? this.pause() : this.run();
     }
-    if (this.isRunning()) {
-      let index = this.lettersArr.indexOf(char);
-      index = index >= 0 ? index : this.lettersArr2.indexOf(char);
+    if (this.isRunning() && this.removeLettersEnabled) {
+      const index = this.getLetterIndex(char);
       if (index >= 0) {
-        const lettersToRemove = document.querySelectorAll(`.letter-${index}`);
-        this.updateScore(lettersToRemove.length);
-        const colsToCheck = [];
-        lettersToRemove.forEach(letter => {
-          colsToCheck.push(letter.dataset.col);
-          this.container.removeChild(letter);
-        });
-        colsToCheck.forEach(col => {
-         const letterInCol = Array.from(document.querySelectorAll(`.letter-col-${col}`))
-              .sort((a, b) => a.dataset.row - b.dataset.row);
-         letterInCol.forEach((el, index) => {
-           el.dataset.row = index;
-           el.style.transitionDuration = '100ms';
-           this.moveLetterToBottom(el);
-         });
-        });
+        const lettersToRemove = Array.from(document.querySelectorAll(`.letter-${index}`));
+        if (lettersToRemove.length > 0) {
+          this.removeLetters(lettersToRemove);
+        }
       }
     }
   }
