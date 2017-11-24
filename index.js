@@ -78,6 +78,7 @@ class CharCatcher {
     el.removeEventListener("transitionend", el.gameOverChecker, false);
     if (this.isRunning() && el.dataset.row > this.MAX_ROW) {
       document.querySelector('#game-over').classList.add('game-over');
+      new Audio('./audio/boom.mp3').play();
       this.pause();
     }
   }
